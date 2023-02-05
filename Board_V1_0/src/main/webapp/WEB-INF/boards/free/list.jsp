@@ -7,10 +7,13 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-  <head>
-    <title>$Title$</title>
-  </head>
-  <body>
-  $END$
-  </body>
+<head>
+    <title>게시판 목록</title>
+</head>
+<body>
+<h1> 자유 게시판 - 목록</h1>
+<div>
+
+</div>
+</body>
 </html>
