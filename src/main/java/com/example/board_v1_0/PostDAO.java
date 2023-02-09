@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -21,31 +22,18 @@ public class PostDAO {
     private Connection conn;
     private PreparedStatement pstmt;
     private ResultSet rs;
-    private StringBuffer query;
-    private List<PostDTO> posts = new LinkedList<>();
+
     private PostDAO() {}
 
     public static PostDAO getInstance() {
         return postDAO;
     }
 
-//    public Long getPostCounts() throws SQLException, ClassNotFoundException {
-//        conn = myConnection.getConnection();
-//        pstmt = conn.prepareStatement("SELECT COUNT(id) AS Count from posts");
-//        rs = pstmt.executeQuery();
-//
-//        Long Count = 0L;
-//        while (rs.next()) {
-//            Count = rs.getLong("Count");
-//        }
-//        return Count;
-//    }
-
     public List<PostDTO> getPostLists() throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
-        pstmt = conn.prepareStatement("SELECT id, category, title, author, created_date, modified_date, hits FROM posts");
+        pstmt = conn.prepareStatement("SELECT id, category, title, author, created_date, modified_date, hits FROM posts ORDER BY id DESC");
         rs = pstmt.executeQuery();
-        posts.clear();
+        List<PostDTO> posts = new LinkedList<>();
 
         while (rs.next()) {
             Long id = rs.getLong("id");
@@ -76,11 +64,44 @@ public class PostDAO {
         return posts;
     }
 
+    public void getPost(Long posId) throws SQLException, ClassNotFoundException {
+    }
+
+    public Long savePost(PostDTO postDTO) throws SQLException, ClassNotFoundException {
+        Long id = 0L;
+        conn = myConnection.getConnection();
+
+        pstmt = conn.prepareStatement("INSERT INTO posts(category, author, passwd, title, content, created_date) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+        pstmt.setString(1, postDTO.getCategory());
+        pstmt.setString(2, postDTO.getAuthor());
+        pstmt.setString(3, postDTO.getPasswd());
+        pstmt.setString(4, postDTO.getTitle());
+        pstmt.setString(5, postDTO.getContent());
+        pstmt.setTimestamp(6, Timestamp.from(Instant.now()));
+
+        // 반영된 레코드 건수를 반환
+        int result = pstmt.executeUpdate();
+        System.out.println("result: " + result);
+
+        rs = pstmt.getGeneratedKeys();
+        if (rs.next()) {
+            id = rs.getLong(1);
+        }
+        return id;
+    }
+
+    public void updatePost(PostDTO postDTO) {
+
+    }
+
+    public void deletePost(PostDTO postDTO) {
+
+    }
     public List<PostDTO> getCategoryList() throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
         pstmt = conn.prepareStatement("select * from category");
         rs = pstmt.executeQuery();
-        posts.clear();
+        List<PostDTO> posts = new LinkedList<>();
 
         while (rs.next()) {
             String category = rs.getString("category");
@@ -98,7 +119,7 @@ public class PostDAO {
     }
 
     String castLocalTimeToTimestmp(LocalDateTime ldt) {
-        String timeStamp = ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String timeStamp = ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
         return timeStamp;
     }

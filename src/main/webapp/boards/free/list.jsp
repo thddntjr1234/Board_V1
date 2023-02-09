@@ -20,11 +20,7 @@
     <%--bootstrap, datetimepicker 적용--%>
     <%--bootstrap, jquery--%>
     <link rel="stylesheet" href="/webjars/bootstrap/5.1.3/css/bootstrap.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-    <%--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js"></script>--%>
-    <%--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>--%>
-    <%--    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js" integrity="sha512-L4qpL1ZotXZLLe8Oo0ZyHrj/SweV7CieswUODAAPN/tnqN3PA1P+4qPu5vIryNor6HQ5o22NujIcAZIfyVXwbQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>--%>
+<%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">--%>
 </head>
 <%
     PostDAO postDAO = PostDAO.getInstance();
@@ -37,10 +33,6 @@
     <form class="form-inline" action="/boards/free/list.jsp" method="get">
         <div class="form-group">
             등록일
-            <%--            <i class="ui-icon-calendar"></i>--%>
-            <%--            <input type="text" id="startDatePicker" class="form-control-sm" value="" readonly> ~--%>
-            <%--            <i class="ui-icon-calendar"></i>--%>
-            <%--            <input type="text" id="endDatePicker" class="form-control-sm" value="" readonly>--%>
 
             <input name="startDate" class="form-control-sm" type="date" required/>
             <input name="endDate" class="form-control-sm" type="date" required/>

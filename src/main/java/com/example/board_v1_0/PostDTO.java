@@ -8,7 +8,7 @@ import lombok.ToString;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-@Getter @Builder @ToString
+@Getter @Setter @Builder @ToString
 public class PostDTO {
     private Long id;
     private Long hits;
