@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 public class PostDAO {
 
-    // 싱글톤으로 PostDAO 사용
     private static final PostDAO postDAO = new PostDAO();
     private MyConnection myConnection = MyConnection.getInstance();
 
@@ -79,43 +78,8 @@ public class PostDAO {
         }
         return count;
     }
-    public boolean nextPage(int pageNumber) {
-        try {
-            PreparedStatement pstmt;
-            conn = myConnection.getConnection();
-            pstmt = conn.prepareStatement("SELECT id FROM posts WHERE id < ? ORDER BY id DESC");
-            pstmt.setInt(1, getNextPostId() - (pageNumber - 1) * 10);
-            rs = pstmt.executeQuery();
 
-            if (rs.next()) {
-                    rs.close();
-
-                return true;
-            }
-        } catch (Exception e) {
-        }
-        return false;
-    }
-
-    public int getNextPostId() {
-        try {
-            PreparedStatement pstmt;
-            conn = myConnection.getConnection();
-            pstmt = conn.prepareStatement("SELECT id FROM posts ORDER BY id DESC");
-            rs = pstmt.executeQuery();
-
-            if (rs.next()) { // 다음에 작성될 게시글의 id를 리턴
-                int result = rs.getInt(1) + 1;
-                rs.close();
-
-                return result;
-            }
-            return 1;
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
+    // view.jsp
     public PostDTO getPost(Long postId) throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
         PreparedStatement pstmt;
@@ -146,6 +110,7 @@ public class PostDAO {
         return postDTO;
     }
 
+    // write.jsp, writeAction.jsp
     public Long savePost(PostDTO postDTO) throws SQLException, ClassNotFoundException {
         Long id = 0L;
         conn = myConnection.getConnection();
@@ -178,6 +143,7 @@ public class PostDAO {
 
     }
 
+    // list.jsp
     public List<PostDTO> getCategoryList() throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
         PreparedStatement pstmt;
@@ -195,11 +161,5 @@ public class PostDAO {
             posts.add(postDto);
         }
         return posts;
-    }
-
-    String castLocalTimeToTimestmp(LocalDateTime ldt) {
-        String timeStamp = ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-
-        return timeStamp;
     }
 }
