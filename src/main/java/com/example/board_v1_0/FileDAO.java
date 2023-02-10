@@ -21,6 +21,7 @@ public class FileDAO {
 
     public void saveFiles(Long postId, List<FileDTO> fileLists) throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
+
         for (FileDTO fileDTO : fileLists) {
             pstmt = conn.prepareStatement("INSERT INTO files VALUES (?, ?, ?)");
             pstmt.setLong(1, postId);
@@ -28,5 +29,8 @@ public class FileDAO {
             pstmt.setString(3, fileDTO.getFileRealName());
             pstmt.executeUpdate();
         }
+        pstmt = conn.prepareStatement("UPDATE posts SET file_flag = 1 WHERE id = ?");
+        pstmt.setLong(1, postId);
+        pstmt.executeUpdate();
     }
 }

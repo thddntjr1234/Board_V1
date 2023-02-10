@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class PostDTO {
     private Long id;
     private Long hits;
+    private Boolean isHaveFile;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
     private String title;
@@ -19,4 +20,5 @@ public class PostDTO {
     private String author;
     private String category;
     private String passwd;
+
 }

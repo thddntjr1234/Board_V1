@@ -74,12 +74,13 @@
         fileLists.add(fileDTO);
     }
 
-    // 게시글 저장 후 파일 테이블에 저장하기 위해 외래키 값
-    FileDAO fileDAO = FileDAO.getInstance();
-    try {
-        fileDAO.saveFiles(postId,fileLists);
-    } catch (SQLException | ClassNotFoundException e) {
-        throw new RuntimeException(e);
+    if (fileLists.size() >= 1) {
+        FileDAO fileDAO = FileDAO.getInstance();
+        try {
+            fileDAO.saveFiles(postId,fileLists);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 %>
 </body>

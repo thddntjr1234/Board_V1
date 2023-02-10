@@ -5,6 +5,7 @@
 <%@ page import="java.sql.SQLException" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css"/>
@@ -20,7 +21,7 @@
     <%--bootstrap, datetimepicker 적용--%>
     <%--bootstrap, jquery--%>
     <link rel="stylesheet" href="/webjars/bootstrap/5.1.3/css/bootstrap.css">
-<%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">--%>
+    <%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">--%>
 </head>
 <%
     PostDAO postDAO = PostDAO.getInstance();
@@ -58,26 +59,50 @@
         </div>
     </form>
 </div>
+<br>
 <div class="container">
     <%
-        // 조회 조건 입력후 검색시 파라미터대로 조회하도록 dao에 로직 추가하고 이 부분 코드 추가해야 함
-        if (request.getParameter("startDate") != null && request.getParameter("endDate") != null) {
-
+        // 총 페이지 개수를 계산
+        int totalPostCount = postDAO.getPostCount();
+        int totalPage = totalPostCount / 10;
+        if (totalPostCount % 10 > 0) {
+            totalPage++;
         }
 
-        List<PostDTO> postLists = postDAO.getPostLists();
+        int currentPage = 1;
+        if (request.getParameter("pageNumber") != null) {
+            currentPage = Integer.parseInt(request.getParameter("pageNumber"));
+        }
+
+        System.out.println("currentPage: " + currentPage);
+        // 만약 총 페이지수보다 높은 현재 페이지를 입력받는다면 강제로 마지막 페이지로 이동
+        if (currentPage > totalPage) {
+            currentPage = totalPage;
+        }
+
+        int startPage = ((currentPage - 1) / 10) * 10 + 1;
+        int endPage = startPage + 10 - 1;
+
+        // 마지막 페이지 보정
+        if (endPage > totalPage) {
+            endPage = totalPage;
+        }
+
+        System.out.println("startpage, endpage : " + startPage + ", " + endPage);
+
+        List<PostDTO> postLists = postDAO.getPostList(currentPage);
         for (PostDTO postDTO : postLists) {
             System.out.println(postDTO.toString());
         }
 
-        Long Count = (long) postLists.size();
+        Long Count = (long) totalPostCount;
     %>
     <p> 총  <%=Count%>건</p>
 </div>
 
 <%--게시글 부분 list.get(page*1~10)으로 id값 가져오게 해야할 것 같음--%>
 <div class="container">
-    <table class="table table-hover" style="text-align: center;">
+    <table class="table table-hover" style="text-align: center; font-size: 12px">
         <thead>
         <tr>
             <th class="w-auto" style="text-align: center;">카테고리</th>
@@ -103,8 +128,16 @@
 
                 out.println("<tr>");
                 out.println("<td>" + dto.getCategory() + "</td>");
-                out.println("<td> </td>"); // 파일 첨부 아이콘 표시 필요
-                out.println("<td style=\"text-align: left;\">" + dto.getTitle() + "</td>");
+                if (dto.getIsHaveFile()) {
+                    out.println("<td> F </td>");
+                } else {
+                    out.println("<td> </td>");
+                }
+                if (dto.getTitle().length() > 80) {
+                    out.println("<td class=\"d-flex justify-content-start\"><a href=\"view.jsp?id=" + dto.getId() + "\">" + dto.getTitle().substring(0, 80) + "..." + "</a></td>");
+                } else {
+                    out.println("<td class=\"d-flex justify-content-start\"><a href=\"view.jsp?id=" + dto.getId() + "\">" + dto.getTitle() + "</a></td>");
+                }
                 out.println("<td>" + dto.getAuthor() + "</td>");
                 out.println("<td>" + dto.getHits() + "</td>");
                 out.println("<td>" + createdDate + "</td>");
@@ -118,18 +151,30 @@
 <%--페이지 부분--%>
 <div class="d-flex justify-content-center">
     <ul class="pagination">
-        <li class="page-item disa"><a class="page-link" href="#"><<</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">4</a></li>
-        <li class="page-item"><a class="page-link" href="#">5</a></li>
-        <li class="page-item"><a class="page-link" href="#">6</a></li>
-        <li class="page-item"><a class="page-link" href="#">7</a></li>
-        <li class="page-item"><a class="page-link" href="#">8</a></li>
-        <li class="page-item"><a class="page-link" href="#">9</a></li>
-        <li class="page-item"><a class="page-link" href="#">10</a></li>
-        <li class="page-item"><a class="page-link" href="#">>></a></li>
+        <%
+            if (startPage > 1) {
+                out.println("<li class=\"page-item\"><a class=\"page-link\" href=\"list.jsp?pageNumber=1\">처음</a></li>");
+            }
+
+            if (currentPage > 1) {
+                out.println("<li class=\"page-item\"><a class=\"page-link\" href=\"list.jsp?pageNumber=" + (currentPage - 1) + "\">이전</a></li>");
+
+            }
+
+            for (int i = startPage; i <= endPage; i++) {
+                out.println(
+                        "<li class=\"page-item\"><a class=\"page-link\" href=\"list.jsp?pageNumber=" + i + "\">" + i + "</a></li>");
+            }
+
+            if (currentPage < totalPage) {
+                out.println("<li class=\"page-item\"><a class=\"page-link\" href=\"list.jsp?pageNumber=" + (currentPage + 1) + "\">다음</a></li>");
+            }
+
+            if (endPage < totalPage) {
+
+                out.println("<li class=\"page-item\"><a class=\"page-link\" href=\"list.jsp?pageNumber=" + totalPage + "\">끝</a></li>");
+            }
+        %>
     </ul>
 </div>
 <div class="d-flex justify-content-end">

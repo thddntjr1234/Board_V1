@@ -20,27 +20,32 @@ public class PostDAO {
     private MyConnection myConnection = MyConnection.getInstance();
 
     private Connection conn;
-    private PreparedStatement pstmt;
     private ResultSet rs;
 
-    private PostDAO() {}
+    private PostDAO() {
+    }
 
     public static PostDAO getInstance() {
         return postDAO;
     }
 
-    public List<PostDTO> getPostLists() throws SQLException, ClassNotFoundException {
-        conn = myConnection.getConnection();
-        pstmt = conn.prepareStatement("SELECT id, category, title, author, created_date, modified_date, hits FROM posts ORDER BY id DESC");
-        rs = pstmt.executeQuery();
+    public List<PostDTO> getPostList(int pageNumber) throws SQLException, ClassNotFoundException {
+        PreparedStatement pstmt;
+
         List<PostDTO> posts = new LinkedList<>();
+        conn = myConnection.getConnection();
+        pstmt = conn.prepareStatement("SELECT * FROM posts ORDER BY id DESC LIMIT ?, 10");
+        pstmt.setInt(1, (pageNumber - 1) * 10);
+        rs = pstmt.executeQuery();
 
         while (rs.next()) {
+            System.out.println("쿼리 실행후 값 가져오기");
             Long id = rs.getLong("id");
             String category = rs.getString("category");
             String title = rs.getString("title");
             String author = rs.getString("author");
             LocalDateTime createdDate = rs.getTimestamp("created_date").toLocalDateTime();
+            Boolean isHaveFile = rs.getBoolean("file_flag");
             LocalDateTime modifiedDate = null;
             if (rs.getTimestamp("modified_date") != null) {
                 modifiedDate = rs.getTimestamp("modified_date").toLocalDateTime();
@@ -54,22 +59,97 @@ public class PostDAO {
                     .author(author)
                     .createdDate(createdDate)
                     .modifiedDate(modifiedDate)
+                    .isHaveFile(isHaveFile)
                     .hits(hits).build();
             posts.add(postDto);
         }
-        rs.close();
-        pstmt.close();
-        conn.close();
+
 
         return posts;
     }
 
-    public void getPost(Long posId) throws SQLException, ClassNotFoundException {
+    public int getPostCount() throws SQLException, ClassNotFoundException {
+        PreparedStatement pstmt;
+        conn = myConnection.getConnection();
+        pstmt = conn.prepareStatement("SELECT COUNT(id) AS Count FROM posts");
+        rs = pstmt.executeQuery();
+        int count = 0;
+        if (rs.next()) {
+            count = rs.getInt("Count");
+        }
+        return count;
+    }
+    public boolean nextPage(int pageNumber) {
+        try {
+            PreparedStatement pstmt;
+            conn = myConnection.getConnection();
+            pstmt = conn.prepareStatement("SELECT id FROM posts WHERE id < ? ORDER BY id DESC");
+            pstmt.setInt(1, getNextPostId() - (pageNumber - 1) * 10);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                    rs.close();
+
+                return true;
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    public int getNextPostId() {
+        try {
+            PreparedStatement pstmt;
+            conn = myConnection.getConnection();
+            pstmt = conn.prepareStatement("SELECT id FROM posts ORDER BY id DESC");
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) { // 다음에 작성될 게시글의 id를 리턴
+                int result = rs.getInt(1) + 1;
+                rs.close();
+
+                return result;
+            }
+            return 1;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public PostDTO getPost(Long postId) throws SQLException, ClassNotFoundException {
+        conn = myConnection.getConnection();
+        PreparedStatement pstmt;
+        pstmt = conn.prepareStatement("SELECT * FROM posts WHERE id = ?");
+        pstmt.setLong(1, postId);
+        rs = pstmt.executeQuery();
+
+        PostDTO postDTO = PostDTO.builder().build();
+        if (rs.next()) {
+            LocalDateTime modifiedDate = null;
+            if (rs.getTimestamp("modified_date") != null) {
+                modifiedDate = rs.getTimestamp("modified_date").toLocalDateTime();
+            }
+            postDTO = PostDTO.builder()
+                    .id(rs.getLong("id"))
+                    .category(rs.getString("category"))
+                    .author(rs.getString("author"))
+                    .title(rs.getString("title"))
+                    .content(rs.getString("content"))
+                    .passwd(rs.getString("passwd"))
+                    .hits(rs.getLong("hits"))
+                    .isHaveFile(rs.getBoolean("file_flag"))
+                    .createdDate(rs.getTimestamp("created_date").toLocalDateTime())
+                    .modifiedDate(modifiedDate)
+                    .build();
+        }
+
+        return postDTO;
     }
 
     public Long savePost(PostDTO postDTO) throws SQLException, ClassNotFoundException {
         Long id = 0L;
         conn = myConnection.getConnection();
+        PreparedStatement pstmt;
 
         pstmt = conn.prepareStatement("INSERT INTO posts(category, author, passwd, title, content, created_date) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         pstmt.setString(1, postDTO.getCategory());
@@ -97,8 +177,11 @@ public class PostDAO {
     public void deletePost(PostDTO postDTO) {
 
     }
+
     public List<PostDTO> getCategoryList() throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
+        PreparedStatement pstmt;
+
         pstmt = conn.prepareStatement("select * from category");
         rs = pstmt.executeQuery();
         List<PostDTO> posts = new LinkedList<>();
@@ -111,10 +194,6 @@ public class PostDAO {
 
             posts.add(postDto);
         }
-        rs.close();
-        pstmt.close();
-        conn.close();
-
         return posts;
     }
 
