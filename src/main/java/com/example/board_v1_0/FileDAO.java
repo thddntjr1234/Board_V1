@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class FileDAO {
@@ -21,6 +23,7 @@ public class FileDAO {
 
     public void saveFiles(Long postId, List<FileDTO> fileLists) throws SQLException, ClassNotFoundException {
         conn = myConnection.getConnection();
+        PreparedStatement pstmt;
 
         for (FileDTO fileDTO : fileLists) {
             pstmt = conn.prepareStatement("INSERT INTO files VALUES (?, ?, ?)");
@@ -33,4 +36,25 @@ public class FileDAO {
         pstmt.setLong(1, postId);
         pstmt.executeUpdate();
     }
+
+    public List<FileDTO> getFileNames(long postid) throws SQLException, ClassNotFoundException {
+        conn = myConnection.getConnection();
+        List<FileDTO> files = new ArrayList<>();
+
+        pstmt = conn.prepareStatement("SELECT * FROM files WHERE id = ?");
+        pstmt.setLong(1, postid);
+        rs = pstmt.executeQuery();;
+
+        while (rs.next()) {
+            FileDTO file = FileDTO.builder()
+                    .fileName(rs.getString("fileName"))
+                    .fileRealName(rs.getString("fileRealName"))
+                    .build();
+
+            files.add(file);
+        }
+
+        return files;
+    }
+
 }

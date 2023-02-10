@@ -3,6 +3,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.sql.SQLException" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
+현<%@ page import="java.io.File" %>
+<%@ page import="com.example.board_v1_0.FileDAO" %>
+<%@ page import="com.example.board_v1_0.FileDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -15,10 +18,14 @@
 
 </head>
 <%
+    request.setCharacterEncoding("utf-8");
+
     Long postId = Long.valueOf(request.getParameter("id"));
     PostDAO postDAO = PostDAO.getInstance();
     PostDTO post = postDAO.getPost(postId);
 
+    FileDAO fileDAO = FileDAO.getInstance();
+    List<FileDTO> files = fileDAO.getFileNames(post.getId());
 %>
 <body>
 <div class="container">
@@ -45,14 +52,18 @@
         <span class="float-end">조회수: <%=post.getHits()%></span>
     </div>
     <br>
-    <div class="container border-secondary">
-        <textarea class="form-text"><%=post.getContent()%></textarea>
+    <div class="container\">
+        <p class="text-md-start" style="font-size: 14px;"><%=post.getContent().replaceAll("\r\n", "<br>")%>
+        </p>
     </div>
     <br>
     <div class="container">
-        <a href=""
+        <%
+            for (FileDTO file : files) {
+                out.println("<div><a href=\"#\" onclick=\"DownloadFile(\'" + file.getFileName() + "\')" + "\">" + file.getFileRealName() + "</a></div>");
+            }
+        %>
     </div>
-
 </div>
 <hr>
 </div>
@@ -61,70 +72,52 @@
 <%--bootstrap, jquery--%>
 <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
 <script src="/webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
-<script>
-    $(function () {
-        console.log("jquery 동작");
-    })
-    $("#boardForm").on("submit", function (event) {
-        event.preventDefault();
-
-        let authorLength = $("#input_author").val().length;
-        if (authorLength < 3 || authorLength >= 5) {
-            alert("작성자명은 3글자 이상, 5글자 미만이어야 합니다.");
-            return;
-        }
-        console.log("작성자명 조건 통과");
-
-        let initPasswd = $("#input_passwd1").val();
-        if (!initPasswd.match(/^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{4,15}$/)) {
-            alert("패스워드는 영문, 숫자, 특수문자를 포함한 4글자 이상, 16글자 미만이어야 합니다.");
-            return;
-        }
-        if ($("#input_passwd1").val() !== $("#input_passwd2").val()) {
-            alert("비밀번호와 비밀번호 확인에 입력한 비밀번호가 일치하지 않습니다.");
-            return;
-        }
-        console.log("패스워드 조건 통과");
-
-        let titleLength = $("#input_title").val().length;
-        if (titleLength < 4 || titleLength >= 100) {
-            alert("제목은 4글자 이상, 100글자 미만이어야 합니다.");
-            return;
-        }
-        console.log("제목명 조건 통과");
-
-        let contentLength = $("#input_content").val().length;
-        if (contentLength < 4 || contentLength >= 2000) {
-            alert("내용은 4글자 이상, 2000글자 미만이어야 합니다");
-            return;
-        }
-        console.log("내용 조건 통과");
-
-        console.log("유효성 검사 통과, ajax로 서버사이드 유효성 검증 실행");
-        // 이 라인까지 도달했으면 front에서의 유효성 검증은 종료, 서버에 ajax로 writeAction.jsp 호출해서 현재 페이지에서 검증 후 db insert
-        let form = $("#boardForm")[0];
-        let formData = new FormData(form);
+<script type="text/javascript">
+    function DownloadFile(fileName) {
+        //Set the File URL.
+        var url = "/files/" + fileName;
 
         $.ajax({
-            type: "POST",
-            enctype: 'multipart/form-data',
-            processData: false,
-            contentType: false,
-            url: "/boards/free/writeAction.jsp",
-            async: false,
-            data: formData,
-            error: function (e) {
-                alert("서버 유효성 검사에서 입력조건 오류 발생", e);
+            url: url,
+            cache: false,
+            xhr: function () {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 2) {
+                        if (xhr.status == 200) {
+                            xhr.responseType = "blob";
+                        } else {
+                            xhr.responseType = "text";
+                        }
+                    }
+                };
+                return xhr;
             },
-            success: function () {
-                console.log("success");
-                alert("저장 성공");
-                window.location.href = "/boards/free/list.jsp"
+            success: function (data) {
+                //Convert the Byte Data to BLOB object.
+                var blob = new Blob([data], {type: "application/octetstream"});
+
+                //Check the Browser type and download the File.
+                var isIE = false || !!document.documentMode;
+                if (isIE) {
+                    window.navigator.msSaveBlob(blob, fileName);
+                } else {
+                    var url = window.URL || window.webkitURL;
+                    link = url.createObjectURL(blob);
+                    var a = $("<a />");
+                    a.attr("download", fileName);
+                    a.attr("href", link);
+                    $("body").append(a);
+                    a[0].click();
+                    $("body").remove(a);
+                }
+                return;
             }
         });
+    };
 
-        return;
-    });
+
+
 </script>
 </body>
 </html>
