@@ -74,7 +74,7 @@
         fileLists.add(fileDTO);
     }
 
-    if (fileLists.size() >= 1) {
+    if (fileLists.size() >= 1) { // files DB에 저장
         FileDAO fileDAO = FileDAO.getInstance();
         try {
             fileDAO.saveFiles(postId,fileLists);

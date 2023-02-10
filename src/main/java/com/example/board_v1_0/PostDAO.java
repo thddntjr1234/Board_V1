@@ -62,7 +62,7 @@ public class PostDAO {
                     .hits(hits).build();
             posts.add(postDto);
         }
-
+        // 요청이 많아지면 close()가 없어서 오류가 발생하는 것 같다. try-catch-finally로 conn, pstmt, rs close() 리팩토링하기(모든 메소드)
 
         return posts;
     }
