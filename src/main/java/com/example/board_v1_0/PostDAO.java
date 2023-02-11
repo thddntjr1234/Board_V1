@@ -46,6 +46,7 @@ public class PostDAO {
             LocalDateTime createdDate = rs.getTimestamp("created_date").toLocalDateTime();
             Boolean isHaveFile = rs.getBoolean("file_flag");
             LocalDateTime modifiedDate = null;
+
             if (rs.getTimestamp("modified_date") != null) {
                 modifiedDate = rs.getTimestamp("modified_date").toLocalDateTime();
             }
@@ -136,11 +137,40 @@ public class PostDAO {
     }
 
     public void updatePost(PostDTO postDTO) {
+        Long id = 0L;
+        PreparedStatement pstmt = null;
 
+        try {
+            conn = myConnection.getConnection();
+            pstmt = conn.prepareStatement("UPDATE posts SET ");
+
+        } catch (Exception e) {
+
+        } finally {
+            if (pstmt != null) try { pstmt.close(); } catch (Exception e) {}
+        }
     }
 
     public void deletePost(PostDTO postDTO) {
 
+    }
+
+    public void increaseHits(Long postId) {
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = myConnection.getConnection();
+            pstmt = conn.prepareStatement("UPDATE posts SET hits = (SELECT hits FROM posts WHERE id = ?) + 1 WHERE id = ?;");
+            pstmt.setLong(1, postId);
+            pstmt.setLong(2, postId);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+        } finally {
+            if (pstmt != null) try {
+                pstmt.close();
+            } catch (Exception e) {
+            }
+        }
     }
 
     // list.jsp
