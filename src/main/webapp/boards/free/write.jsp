@@ -141,7 +141,7 @@
             async: false,
             data: formData,
             error: function (e) {
-                alert("서버 유효성 검사에서 입력조건 오류 발생", e);
+                alert("입력 조건이 맞지 않습니다.", e);
             },
             success: function () {
                 console.log("success");

@@ -24,7 +24,7 @@
 
     Long postId = 0L;
 
-    // DAO에 파라미터 받아서 build
+    // DTO에 파라미터 받아서 build
     PostDTO postDTO = PostDTO.builder()
             .category(multi.getParameter("category"))
             .author(multi.getParameter("author"))
@@ -33,6 +33,7 @@
             .content(multi.getParameter("content"))
             .build();
     System.out.println("입력된 게시글 정보는 - " + postDTO.toString());
+
 
     // 게시글 저장
     PostDAO postDAO = PostDAO.getInstance();

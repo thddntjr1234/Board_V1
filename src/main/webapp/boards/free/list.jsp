@@ -32,7 +32,7 @@
 </div>
 <div class="container">
     <form class="form-inline" action="/boards/free/list.jsp" method="get">
-        <div class="form-group">
+        <div class="input-group-sm">
             등록일
 
             <input name="startDate" class="form-control-sm" type="date" required/>
@@ -180,6 +180,7 @@
 <div class="d-flex justify-content-end">
     <button class="btn btn-secondary" onclick="location.href='/boards/free/write.jsp'">등록</button>
 </div>
+
 
 <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
 <script src="/webjars/bootstrap/5.1.3/js/bootstrap.js"></script>
