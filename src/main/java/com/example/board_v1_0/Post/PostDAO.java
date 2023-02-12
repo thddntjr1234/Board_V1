@@ -17,8 +17,9 @@ public class PostDAO {
     private static final PostDAO postDAO = new PostDAO();
     private MyConnection myConnection = MyConnection.getInstance();
 
-    private Connection conn;
-    private ResultSet rs;
+    // TODO: 싱글톤으로 사용할 떄 상태를 공유하는 변수들이 없도록 고려
+    // key.equals("value")와 "value".equals(key)의 차이는
+    // null이 일을 하게 하는지의 차이다.
 
     private PostDAO() {
     }
@@ -27,12 +28,20 @@ public class PostDAO {
         return postDAO;
     }
 
+    /**
+     * 목록 조회
+     * @param pageNumber: 현재 페이지의 값만큼 뒤에서부터 게시글을 SELECT
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public List<PostDTO> getPostList(int pageNumber) throws SQLException, ClassNotFoundException {
         // TODO: conn, pstmt, rs는 지역변수들로 선언
         PreparedStatement pstmt = null;
         Connection conn = null;
         ResultSet rs = null;
         List<PostDTO> posts = new LinkedList<>();
+
         conn = myConnection.getConnection();
         pstmt = conn.prepareStatement("SELECT * FROM posts ORDER BY id DESC LIMIT ?, 10");
         pstmt.setInt(1, (pageNumber - 1) * 10);

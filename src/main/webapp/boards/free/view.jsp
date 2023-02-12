@@ -67,6 +67,7 @@
     </div>
     <br>
     <div class="container">
+<%--        이렇게 <div><a href="download(32)"></a></div>--%>
         <%
             for (FileDTO file : files) {
                 out.println("<div><a href=\"#\" onclick=\"DownloadFile(\'" + file.getFileName() + "\')" + "\">" + file.getFileRealName() + "</a></div>");

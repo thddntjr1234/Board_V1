@@ -96,9 +96,9 @@
             System.out.println(postDTO.toString());
         }
 
-        Long Count = (long) totalPostCount;
+        Long count = (long) totalPostCount;
     %>
-    <p> 총  <%=Count%>건</p>
+    <p> 총  <%=count%>건</p>
 </div>
 
 <%--게시글 부분 list.get(page*1~10)으로 id값 가져오게 해야할 것 같음--%>
