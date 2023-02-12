@@ -1,4 +1,4 @@
-package com.example.board_v1_0;
+package com.example.board_v1_0.Comment;
 
 import lombok.Builder;
 import lombok.Getter;

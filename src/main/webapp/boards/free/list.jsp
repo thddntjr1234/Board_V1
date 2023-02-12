@@ -1,7 +1,7 @@
 <%--<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>--%>
 <%--<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>--%>
-<%@ page import="com.example.board_v1_0.PostDAO" %>
-<%@ page import="com.example.board_v1_0.PostDTO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDAO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDTO" %>
 <%@ page import="java.sql.SQLException" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
@@ -41,6 +41,7 @@
             <select class="form-select-sm" name="category" required>
                 <option value="all">전체 카테고리</option>
                 <%
+                    // TODO: 카테고리 분리 필요
                     List<PostDTO> categoryList;
                     try {
                         categoryList = postDAO.getCategoryList();

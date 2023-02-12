@@ -1,16 +1,12 @@
-package com.example.board_v1_0;
+package com.example.board_v1_0.Comment;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.w3c.dom.Comment;
+import com.example.board_v1_0.Connection.MyConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 

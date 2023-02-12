@@ -1,4 +1,4 @@
-package com.example.board_v1_0;
+package com.example.board_v1_0.Connection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 public class MyConnection {
 
-    // 싱글턴 방식, 이렇게 미리 인스턴스를 만들어야 경합 과정에서 인스턴스가 두개 이상 생기는 것을 방지할 수 있음
     private static MyConnection myConnection = new MyConnection();
 
     private MyConnection() {}

@@ -1,12 +1,11 @@
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="java.util.Enumeration" %>
-<%@ page import="com.example.board_v1_0.PostDAO" %>
-<%@ page import="com.oreilly.servlet.MultipartResponse" %>
-<%@ page import="com.example.board_v1_0.PostDTO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDAO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDTO" %>
 <%@ page import="java.sql.SQLException" %>
-<%@ page import="com.example.board_v1_0.FileDAO" %>
-<%@ page import="com.example.board_v1_0.FileDTO" %>
+<%@ page import="com.example.board_v1_0.File.FileDAO" %>
+<%@ page import="com.example.board_v1_0.File.FileDTO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.LinkedList" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>

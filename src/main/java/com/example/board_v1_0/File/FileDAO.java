@@ -1,11 +1,12 @@
-package com.example.board_v1_0;
+package com.example.board_v1_0.File;
+
+import com.example.board_v1_0.Connection.MyConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class FileDAO {

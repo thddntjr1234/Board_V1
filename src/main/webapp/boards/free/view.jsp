@@ -3,6 +3,12 @@
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.io.File" %>
 <%@ page import="com.example.board_v1_0.*" %>
+<%@ page import="com.example.board_v1_0.Comment.CommentDAO" %>
+<%@ page import="com.example.board_v1_0.Comment.CommentDTO" %>
+<%@ page import="com.example.board_v1_0.File.FileDAO" %>
+<%@ page import="com.example.board_v1_0.File.FileDTO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDAO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -17,6 +23,7 @@
 <%
     request.setCharacterEncoding("utf-8");
 
+    // TODO: postId가 전달되지 않을 경우(예외)를 고려하자
     Long postId = Long.valueOf(request.getParameter("id"));
 
     PostDAO postDAO = PostDAO.getInstance();

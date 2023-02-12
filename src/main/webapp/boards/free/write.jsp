@@ -1,5 +1,5 @@
-<%@ page import="com.example.board_v1_0.PostDTO" %>
-<%@ page import="com.example.board_v1_0.PostDAO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDTO" %>
+<%@ page import="com.example.board_v1_0.Post.PostDAO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.sql.SQLException" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -141,7 +141,7 @@
             async: false,
             data: formData,
             error: function (e) {
-                alert("입력 조건이 맞지 않습니다.", e);
+                alert(e);
             },
             success: function () {
                 console.log("success");

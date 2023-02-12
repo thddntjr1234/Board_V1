@@ -1,14 +1,13 @@
-package com.example.board_v1_0;
+package com.example.board_v1_0.Post;
 
 
+import com.example.board_v1_0.Connection.MyConnection;
 import lombok.Getter;
-import lombok.Setter;
+import org.checkerframework.framework.qual.FromByteCode;
 
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,14 +28,17 @@ public class PostDAO {
     }
 
     public List<PostDTO> getPostList(int pageNumber) throws SQLException, ClassNotFoundException {
-        PreparedStatement pstmt;
-
+        // TODO: conn, pstmt, rs는 지역변수들로 선언
+        PreparedStatement pstmt = null;
+        Connection conn = null;
+        ResultSet rs = null;
         List<PostDTO> posts = new LinkedList<>();
         conn = myConnection.getConnection();
         pstmt = conn.prepareStatement("SELECT * FROM posts ORDER BY id DESC LIMIT ?, 10");
         pstmt.setInt(1, (pageNumber - 1) * 10);
         rs = pstmt.executeQuery();
 
+        // TODO: try-catch-finally
         while (rs.next()) {
             System.out.println("쿼리 실행후 값 가져오기");
             Long id = rs.getLong("id");
@@ -69,7 +71,10 @@ public class PostDAO {
     }
 
     public int getPostCount() throws SQLException, ClassNotFoundException {
-        PreparedStatement pstmt;
+        PreparedStatement pstmt = null;
+        Connection conn = null;
+        ResultSet rs = null;
+
         conn = myConnection.getConnection();
         pstmt = conn.prepareStatement("SELECT COUNT(id) AS Count FROM posts");
         rs = pstmt.executeQuery();
@@ -82,8 +87,11 @@ public class PostDAO {
 
     // view.jsp
     public PostDTO getPost(Long postId) throws SQLException, ClassNotFoundException {
+        PreparedStatement pstmt = null;
+        Connection conn = null;
+        ResultSet rs = null;
+
         conn = myConnection.getConnection();
-        PreparedStatement pstmt;
         pstmt = conn.prepareStatement("SELECT * FROM posts WHERE id = ?");
         pstmt.setLong(1, postId);
         rs = pstmt.executeQuery();
@@ -113,10 +121,17 @@ public class PostDAO {
 
     // write.jsp, writeAction.jsp
     public Long savePost(PostDTO postDTO) throws SQLException, ClassNotFoundException {
-        Long id = 0L;
-        conn = myConnection.getConnection();
-        PreparedStatement pstmt;
 
+        // TODO: 단방향 암호화 구현하기
+        long id = 0L;
+        PreparedStatement pstmt = null;
+        Connection conn = null;
+        ResultSet rs = null;
+        conn = myConnection.getConnection();
+
+        // String sql = "CREATE
+//                            FROM
+//                            WHERE 방식으로 들여쓰기 하기
         pstmt = conn.prepareStatement("INSERT INTO posts(category, author, passwd, title, content, created_date) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         pstmt.setString(1, postDTO.getCategory());
         pstmt.setString(2, postDTO.getAuthor());
@@ -136,16 +151,18 @@ public class PostDAO {
         return id;
     }
 
+    // 미구현
     public void updatePost(PostDTO postDTO) {
         Long id = 0L;
         PreparedStatement pstmt = null;
+        Connection conn = null;
 
         try {
             conn = myConnection.getConnection();
             pstmt = conn.prepareStatement("UPDATE posts SET ");
 
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         } finally {
             if (pstmt != null) try { pstmt.close(); } catch (Exception e) {}
         }
@@ -157,6 +174,7 @@ public class PostDAO {
 
     public void increaseHits(Long postId) {
         PreparedStatement pstmt = null;
+        Connection conn = null;
 
         try {
             conn = myConnection.getConnection();
@@ -165,18 +183,23 @@ public class PostDAO {
             pstmt.setLong(2, postId);
             pstmt.executeUpdate();
         } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             if (pstmt != null) try {
+                conn.close();
                 pstmt.close();
             } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
     // list.jsp
     public List<PostDTO> getCategoryList() throws SQLException, ClassNotFoundException {
+        PreparedStatement pstmt = null;
+        Connection conn = null;
+        ResultSet rs = null;
         conn = myConnection.getConnection();
-        PreparedStatement pstmt;
 
         pstmt = conn.prepareStatement("select * from category");
         rs = pstmt.executeQuery();
